@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Midfielder Transfer Value Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #ececec, #d7f2ff);
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+     video#bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            filter: brightness(0.45);
+        }
+    body.dark {
+      background: linear-gradient(135deg, #121212, #1f1f1f);
+      color: #ffffff;
+    }
+
+    .dark-mode-toggle {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      cursor: pointer;
+      font-size: 1.5rem;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      transition: background 0.3s ease;
+    }
+
+    .dark-mode-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #00ffff;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 20px #00ffff, 0 0 30px #ff00ff;
+      backdrop-filter: blur(10px);
+      animation: floatBox 4s ease-in-out infinite alternate;
+    }
+
+    body.dark .container {
+      background: rgba(40, 40, 40, 0.85);
+    }
+
+    @keyframes floatBox {
+      from {
+        transform: translateY(0px);
+      }
+      to {
+        transform: translateY(-10px);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(270deg, #00ffff, #ff00ff, #00ffff);
+      background-size: 600% 600%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 6s ease infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .input-card {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 0.5rem;
+      border: 2px solid #ccc;
+      background: #f8f8f8;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    body.dark input[type="number"] {
+      background: #1e1e1e;
+      color: #fff;
+      border-color: #444;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    .tooltip {
+  position: absolute;
+  top: -1.8rem;
+  left: 0;
+  font-size: 0.75rem;
+  background: #333;
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.input-card:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+    .submit-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(90deg, #00ffff, #ff00ff);
+      color: black;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
+    }
+
+    .result {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 1.25rem;
+      color: #00ffcc;
+      animation: glowPulse 2s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      from {
+        text-shadow: 0 0 10px #00ffcc;
+      }
+      to {
+        text-shadow: 0 0 20px #00ffcc;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <video autoplay muted loop id="bg-video">
+  <source src="static/backvid.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+  <div class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+    <i class="fa-solid fa-moon" id="darkIcon"></i>
+  </div>
+
+  <div class="container">
+    <h2><i class="fa-solid fa-futbol"></i> Midfielder Transfer Value Predictor</h2>
+    <form method="POST">
+      {% for name in feature_names %}
+<div class="input-card" style="position: relative;">
+  <label for="{{ name }}">
+    {{ name }}
+    <span class="tooltip">
+      {% if name == "Club Level" %}
+        1 = Big Club, 2 = Medium, 3 = Small Club
+      {% elif name == "Goals" %}
+        Enter total number of goals scored last season
+      {% elif name == "Assists" %}
+        Enter total number of assists provided
+      {% elif name == "Key Passes" %}
+        Average number of key passes per match
+      {% elif name == "Tackles" %}
+        Number of successful tackles per match
+      {% elif name == "Interceptions" %}
+        Number of interceptions per match
+      {% elif name == "Dribbles" %}
+        Average dribbles completed per match
+      {% elif name == "Pass Accuracy" %}
+        Pass accuracy percentage (0–100)
+      {% elif name == "Minutes Played" %}
+        Total minutes played in the season
+      {% else %}
+        Enter a valid value for {{ name }}
+      {% endif %}
+    </span>
+  </label>
+  <input type="number" name="{{ name }}" step="any" required value="{{ request.form.get(name, '') }}">
+</div>
+{% endfor %}
+      <button type="submit" class="submit-btn"><i class="fa-solid fa-coins"></i> Predict</button>
+    </form>
+
+    {% if prediction is not none %}
+    <div class="result">
+      <i class="fa-solid fa-euro-sign"></i> Predicted Transfer Value: {{ prediction }} million euros
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+    window.onload = () => {
+      if (!localStorage.getItem("theme")) {
+        document.body.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        const savedTheme = localStorage.getItem("theme");
+        document.body.classList.toggle("dark", savedTheme === "dark");
+        toggleIcon(savedTheme === "dark");
+      }
+    };
+
+    function toggleDarkMode() {
+      const isDark = document.body.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      toggleIcon(isDark);
+    }
+
+    function toggleIcon(isDark) {
+      const icon = document.getElementById('darkIcon');
+      icon.classList.toggle("fa-moon", isDark);
+      icon.classList.toggle("fa-sun", !isDark);
+    }
+  </script>
+</body>
+</html>
